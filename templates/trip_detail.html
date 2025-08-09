@@ -1,0 +1,31 @@
+<!-- templates/trip_detail.html -->
+{% extends 'base.html' %}
+{% load markdownify %} <!-- markdownify kutubxonasini yuklaymiz -->
+
+<!-- trip.destination bu o'zgaruvchi. TripPlan modelidagi destination maydoni -->
+{% block title %}Sayohat Rejasi: {{ trip.destination }}{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm p-4">
+                <!-- AI qaytargan matnni olib, uni 'markdownify' filtri orqali HTML'ga o'giramiz -->
+                {{ trip.generated_plan|markdownify }}
+                {% if trip.user == user %}
+                <hr>
+                <div class="text-end">
+                    <a href="{% url 'trip_edit' pk=trip.pk %}" class="btn btn-warning">Edit Plan</a>
+                    <a href="{% url 'trip_delete' pk=trip.pk %}" class="btn btn-danger">Delete Plan</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+ templates/trip_detail.html
+ templates/trip_detail.html (Diagnostika versiyasi)
+ templates/trip_detail.html (Corrected Diagnostic Version)
+

@@ -1,0 +1,34 @@
+<!-- templates/my_plans.html -->
+{% extends 'base.html' %}
+
+{% block title %}My Travel Plans{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">My Travel Plans</h1>
+
+    {% if plans_list %}
+        <div class="list-group">
+            {% for plan in plans_list %}
+                <a href="{{ plan.get_absolute_url }}" class="list-group-item list-group-item-action flex-column align-items-start mb-2 shadow-sm">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ plan.destination }}</h5>
+                        <small>{{ plan.created_at|date:"d M, Y" }}</small>
+                    </div>
+                    <p class="mb-1">
+                        A {{ plan.duration_days }}-day trip with a {{ plan.budget }} budget.
+                    </p>
+                    <small class="text-muted">
+                        <a href="{% url 'trip_edit' pk=plan.pk %}">Edit</a> |
+                        <a href="{% url 'trip_delete' pk=plan.pk %}" class="text-danger">Delete</a>
+                    </small>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            You haven't created any travel plans yet. <a href="{% url 'home' %}" class="alert-link">Why not create your first one?</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}

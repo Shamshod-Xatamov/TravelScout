@@ -1,0 +1,27 @@
+<!-- templates/home.html -->
+{% extends 'base.html' %}
+{% load crispy_forms_tags %} <!-- 1. LOAD THE TAGS -->
+
+{% block title %}Create Your AI Travel Plan{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm p-4">
+                <h1 class="text-center mb-4">Your AI-Powered Travel Scout</h1>
+                <p class="text-center text-muted mb-4">Fill out the details below and let AI plan your next adventure!</p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg mt-3">Create My Plan!</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

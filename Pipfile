@@ -5,6 +5,12 @@ name = "pypi"
 
 [packages]
 django = "*"
+django-crispy-forms = "*"
+crispy-bootstrap5 = "*"
+django-ckeditor = "*"
+google-generativeai = "*"
+django-markdownify = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
