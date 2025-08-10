@@ -11,6 +11,9 @@ django-ckeditor = "*"
 google-generativeai = "*"
 django-markdownify = "*"
 python-dotenv = "*"
+weasyprint = "*"
+django-weasyprint = "*"
+crispy-tailwind = "*"
 
 [dev-packages]
 

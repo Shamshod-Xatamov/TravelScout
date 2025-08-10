@@ -1,12 +1,15 @@
 import os
 
 
-from django.views.generic import CreateView,DetailView,ListView,UpdateView,DeleteView
+from django.views.generic import CreateView,DetailView,ListView,UpdateView,DeleteView,TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin,UserPassesTestMixin
 from django.urls import reverse_lazy
 from .models import TripPlan
 import google.generativeai as genai
-
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from django.contrib.messages.views import SuccessMessageMixin
 try:
     api_key=os.environ.get("GOOGLE_API_KEY")
     if api_key:
@@ -19,9 +22,12 @@ except Exception as e:
     print(f"Google AI'ni sozlashda xatolik: {e}")
     model = None
 
-class TripPlanCreateView(LoginRequiredMixin,CreateView):
-    model=TripPlan
+class HomePageView(TemplateView):
     template_name = 'home.html'
+
+class TripPlanCreateView(CreateView):
+    model=TripPlan
+    template_name = 'trip_new.html'
     fields = ['destination','duration_days','interests','budget']
 
     def form_valid(self, form):
@@ -87,10 +93,11 @@ class TripPlanListView(LoginRequiredMixin,ListView):
 
 
 
-class TripPlanUpdateView(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
+class TripPlanUpdateView(LoginRequiredMixin,UserPassesTestMixin,SuccessMessageMixin,UpdateView):
     model=TripPlan
     fields = ('destination', 'duration_days', 'interests', 'budget')
     template_name = 'trip_edit.html'
+    success_message = "Your travel plan was updated successfully!"
 
     def form_valid(self, form):
         form.instance.user=self.request.user
@@ -145,11 +152,38 @@ class TripPlanUpdateView(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
         plan=self.get_object()
         return self.request.user==plan.user
 
-class TripPlanDeleteView(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
+class TripPlanDeleteView(LoginRequiredMixin,UserPassesTestMixin,SuccessMessageMixin,DeleteView):
     model=TripPlan
     template_name = "trip_confirm_delete.html"
     success_url = reverse_lazy('my_plans_list')
+    success_message = "Your travel plan was deleted successfully."
+
+
 
     def test_func(self):
         plan = self.get_object()
         return self.request.user == plan.user
+
+
+def trip_plan_pdf_view(request, pk):
+
+    try:
+        trip_plan = TripPlan.objects.get(pk=pk)
+    except TripPlan.DoesNotExist:
+        return HttpResponse("Sayohat rejasi topilmadi.", status=404)
+
+    if request.user != trip_plan.user:
+        return HttpResponse("Sizda bu rejani ko'rishga ruxsat yo'q.", status=403)
+
+    # 3. PDF uchun maxsus shablonni 'context' bilan birga HTML matniga o'giramiz
+    context = {'trip': trip_plan}
+    html_string = render_to_string('trip_pdf.html', context)
+
+    # 4. WeasyPrint yordamida HTML matnidan PDF yaratamiz
+    html = HTML(string=html_string)
+    pdf_file = html.write_pdf()
+
+    # 5. Foydalanuvchiga PDF faylni yuklab olish uchun HttpResponse qaytaramiz
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="trip_plan_{trip_plan.destination}.pdf"'
+    return response

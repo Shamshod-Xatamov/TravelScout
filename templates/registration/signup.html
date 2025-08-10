@@ -1,8 +1,8 @@
-<!-- templates/registration/login.html -->
+<!-- templates/registration/signup.html -->
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}Log In to TravelScout{% endblock title %}
+{% block title %}Sign Up for TravelScout{% endblock title %}
 
 {% block content %}
 <div class="flex items-center justify-center min-h-screen bg-slate-900 px-4">
@@ -16,7 +16,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-8 w-8 text-cyan-400"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8l-8.2 8.2"></path><path d="m2 2 7.5 7.5"></path><path d="M11 11 8 8"></path></svg>
                     <span>TravelScout</span>
                 </a>
-                <p class="text-slate-400 mt-2">Log in to continue your journey</p>
+                <p class="text-slate-400 mt-2">Create an account to start planning</p>
             </div>
 
             <!-- Forma -->
@@ -26,25 +26,20 @@
                 <!-- Crispy Forms yordamida chizilgan maydonlar -->
                 {{ form|crispy }}
 
-                <!-- Parolni unutganlar uchun link -->
-                <div class="text-right mt-2">
-                    <a href="{% url 'password_reset' %}" class="text-sm text-cyan-400 hover:text-cyan-300">Forgot password?</a>
-                </div>
-
                 <!-- Tugma -->
                 <div class="d-grid gap-2 mt-6">
                     <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3 px-4 rounded-lg transition-colors">
-                        Log In
+                        Sign Up
                     </button>
                 </div>
             </form>
 
         </div>
 
-        <!-- "Sign Up" uchun link -->
+        <!-- "Log In" uchun link -->
         <p class="text-center text-slate-400 mt-6">
-            Don't have an account?
-            <a href="{% url 'signup' %}" class="font-medium text-cyan-400 hover:text-cyan-300">Sign Up</a>
+            Already have an account?
+            <a href="{% url 'login' %}" class="font-medium text-cyan-400 hover:text-cyan-300">Log In</a>
         </p>
     </div>
 </div>

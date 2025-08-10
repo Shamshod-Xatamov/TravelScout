@@ -1,0 +1,30 @@
+<!-- templates/trip_pdf.html -->
+{% load markdownify %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Plan: {{ trip.destination }}</title>
+    <style>
+        /* Simple styles for the PDF */
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        body {
+            font-family: sans-serif;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #0056b3;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    {{ trip.generated_plan|markdownify|safe }}
+</body>
+</html>

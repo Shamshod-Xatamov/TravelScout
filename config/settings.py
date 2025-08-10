@@ -14,6 +14,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+import os
 load_dotenv()
 
 
@@ -45,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # tashqi applar
     'crispy_forms',
-    'crispy_bootstrap5',  # <-- ADD THIS
+    'crispy_tailwind',  # <-- ADD THIS
     'markdownify',
 
     #men ozim yaratgan applar
@@ -137,8 +138,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
+# settings.py
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+CRISPY_TEMPLATE_PACK = "tailwind"
 
+LOGIN_REDIRECT_URL = 'my_plans_list'
+LOGOUT_REDIRECT_URL = 'home'
 
+# Logout qilinganidan so'ng, ochiq bo'lgan bosh sahifaga qaytish
 
+# MANA SHU BLOKNI QO'SHING YOKI TO'G'RILANG:
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# Bu qator production uchun. Hozircha shu holatda turaversin.
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

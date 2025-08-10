@@ -15,8 +15,10 @@
                 {% if trip.user == user %}
                 <hr>
                 <div class="text-end">
+                    <a href="{% url 'trip_pdf' pk=trip.pk %}" class="btn btn-success">Download as PDF</a>
                     <a href="{% url 'trip_edit' pk=trip.pk %}" class="btn btn-warning">Edit Plan</a>
                     <a href="{% url 'trip_delete' pk=trip.pk %}" class="btn btn-danger">Delete Plan</a>
+                    <a href="{% url 'my_plans_list' %}" class="btn btn-secondary"> Back to My Plans</a>
                 </div>
                 {% endif %}
             </div>

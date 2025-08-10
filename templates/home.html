@@ -1,27 +1,85 @@
 <!-- templates/home.html -->
 {% extends 'base.html' %}
-{% load crispy_forms_tags %} <!-- 1. LOAD THE TAGS -->
 
-{% block title %}Create Your AI Travel Plan{% endblock title %}
+{% block title %}Your Perfect Itinerary. Instantly.{% endblock title %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-sm p-4">
-                <h1 class="text-center mb-4">Your AI-Powered Travel Scout</h1>
-                <p class="text-center text-muted mb-4">Fill out the details below and let AI plan your next adventure!</p>
+<section class="relative h-screen flex items-center justify-center overflow-hidden">
+    <!-- Animated Gradient Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-slate-100 via-blue-50 to-purple-100 animate-gradient-shift">
+        <div class="absolute inset-0 bg-gradient-to-tr from-blue-200/40 via-transparent to-purple-200/30 animate-gradient-overlay"></div>
+    </div>
 
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form|crispy }}
+    <!-- Animated Particle Effect -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-1/4 left-1/4 w-1 h-1 bg-slate-400/30 rounded-full animate-float-slow"></div>
+        <div class="absolute top-1/3 right-1/3 w-0.5 h-0.5 bg-cyan-600/40 rounded-full animate-float-medium"></div>
+        <div class="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 bg-blue-600/20 rounded-full animate-float-fast"></div>
+        <div class="absolute top-2/3 right-1/4 w-0.5 h-0.5 bg-slate-500/40 rounded-full animate-float-slow"></div>
+        <div class="absolute bottom-1/4 right-2/3 w-1 h-1 bg-purple-600/30 rounded-full animate-float-medium"></div>
+    </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg mt-3">Create My Plan!</button>
-                    </div>
-                </form>
+    <!-- Main Content Container -->
+    <div class="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 text-center">
+        <!-- Main Headline -->
+        <h1 class="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-slate-800 mb-8 leading-tight animate-fade-slide-up">
+            <span class="block font-black tracking-tight">AI-Crafted Journeys</span>
+            <span class="block font-black tracking-tight">Human Memories</span>
+            <span class="block font-black tracking-tight bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+            Unforgettable
+            </span>
+        </h1>
+
+        <!-- Sub-headline -->
+        <p class="text-xl sm:text-2xl lg:text-3xl text-slate-600 mb-12 font-light leading-relaxed max-w-4xl mx-auto animate-fade-slide-up-delayed">
+            Stop searching, start traveling. Our AI crafts personalized travel plans in seconds, tailored to your
+            interests and budget.
+        </p>
+
+        <!-- Call-to-Action Button with Django Logic -->
+        <div class="animate-fade-slide-up-delayed-2">
+            {% if user.is_authenticated %}
+                <a href="{% url 'trip_new' %}">
+                    <button class="group relative bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-12 py-6 text-xl font-bold rounded-full shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-cyan-500/25 border-0 overflow-hidden">
+                        <span class="relative z-10 flex items-center gap-3">
+                        Generate My Free Plan
+                        <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                        </span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    </button>
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}">
+                     <button class="group relative bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-12 py-6 text-xl font-bold rounded-full shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-cyan-500/25 border-0 overflow-hidden">
+                        <span class="relative z-10 flex items-center gap-3">
+                        Get Started Now
+                        <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                        </span>
+                         <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    </button>
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Trust Indicators -->
+        <div class="mt-16 animate-fade-slide-up-delayed-3">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-8 text-slate-500 text-sm">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>AI-Powered Planning</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse delay-300"></div>
+                    <span>Personalized Recommendations</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse delay-700"></div>
+                    <span>Instant Results</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock content %}
