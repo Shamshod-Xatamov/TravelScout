@@ -78,9 +78,48 @@
   animation: fade-slide-up 1s ease-out 1.2s both;
 }
 
-
 label {
-    color: red; /* Bu Tailwind'dagi 'text-slate-300' rangiga yaqin, yorqinroq kulrang */
-    font-weight: 500; /* Matnni biroz qalinroq qilish (ixtiyoriy) */
+    color: #4b5563 !important; /* To'q kulrang (text-gray-600) */
+    font-weight: 500 !important;
 }
 
+/* Barcha Input, Textarea, va Select maydonlari uchun */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+    background-color: white !important;           /* OQ FON */
+    color: black !important;                      /* QORA MATN */
+    border: 1px solid #d1d5db !important;        /* Och kulrang chegara (border-gray-300) */
+    border-radius: 0.5rem !important;
+    width: 100%;
+    padding: 0.75rem 1rem;
+}
+
+/* Maydonga bosganda (fokusda) */
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #2563eb !important; /* Yorqin ko'k rang (border-blue-600) */
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4) !important;
+    outline: none !important;
+}
+
+/* Placeholder matni uchun (ichidagi yordamchi matn) */
+::placeholder {
+  color: #9ca3af !important; /* O'rta kulrang (text-gray-400) */
+  opacity: 1;
+}
+
+/* Select (dropdown) strelkasi uchun */
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+    background-position: right 0.5rem center !important;
+    background-repeat: no-repeat !important;
+    background-size: 1.5em 1.5em !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none !important;
+}

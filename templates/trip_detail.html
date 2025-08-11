@@ -1,33 +1,81 @@
-<!-- templates/trip_detail.html -->
+<!-- templates/trip_detail.html (Pure Tailwind CSS Version) -->
 {% extends 'base.html' %}
-{% load markdownify %} <!-- markdownify kutubxonasini yuklaymiz -->
+{% load markdownify %}
 
-<!-- trip.destination bu o'zgaruvchi. TripPlan modelidagi destination maydoni -->
-{% block title %}Sayohat Rejasi: {{ trip.destination }}{% endblock title %}
+{% block title %}Your Trip to {{ trip.destination }}{% endblock title %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow-sm p-4">
-                <!-- AI qaytargan matnni olib, uni 'markdownify' filtri orqali HTML'ga o'giramiz -->
-                {{ trip.generated_plan|markdownify }}
-                {% if trip.user == user %}
-                <hr>
-                <div class="text-end">
-                    <a href="{% url 'trip_pdf' pk=trip.pk %}" class="btn btn-success">Download as PDF</a>
-                    <a href="{% url 'trip_edit' pk=trip.pk %}" class="btn btn-warning">Edit Plan</a>
-                    <a href="{% url 'trip_delete' pk=trip.pk %}" class="btn btn-danger">Delete Plan</a>
-                    <a href="{% url 'my_plans_list' %}" class="btn btn-secondary"> Back to My Plans</a>
+<div class="container mx-auto mt-8 px-4 mb-8">
+
+    <!-- Main Title and Introduction -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-white">{{ plan_title|safe }}</h1>
+        <p class="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">{{ plan_introduction|safe }}</p>
+    </div>
+
+    <!-- Accordion built with Tailwind CSS and simple JavaScript -->
+    <div class="space-y-3 max-w-4xl mx-auto">
+        {% for day in days_list %}
+        <div class="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+            <!-- Accordion Header -->
+            <button class="w-full flex justify-between items-center p-5 text-left text-white font-bold text-xl focus:outline-none accordion-header">
+                <span>{{ day.title|safe }}</span>
+                <!-- Arrow Icon -->
+                <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <!-- Accordion Content (Hidden by default) -->
+            <div class="accordion-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+                <div class="p-5 border-t border-slate-700 text-slate-300">
+                    {{ day.content|markdownify|safe }}
                 </div>
-                {% endif %}
             </div>
         </div>
+        {% endfor %}
     </div>
+
+</div>
+
+    <!-- ====================================================== -->
+    <!--     MANA SHU YO'QOLGAN TUGMALAR BLOKINI QO'SHAMIZ       -->
+    <!-- ====================================================== -->
+    <div class="mt-8 text-center space-x-4">
+        {% if trip.user == user %}
+            <a href="{% url 'trip_pdf' pk=trip.pk %}" class="inline-block rounded-md bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-500">Download as PDF</a>
+            <a href="{% url 'trip_edit' pk=trip.pk %}" class="inline-block rounded-md bg-yellow-500 px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-yellow-400">Edit & Regenerate</a>
+            <a href="{% url 'trip_delete' pk=trip.pk %}" class="inline-block rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-500">Delete Plan</a>
+        {% endif %}
+        <a href="{% url 'my_plans_list' %}" class="inline-block rounded-md bg-gray-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-500">&larr; Back to My Plans</a>
+    </div>
+
+</div>
+
+
 </div>
 {% endblock content %}
 
- templates/trip_detail.html
- templates/trip_detail.html (Diagnostika versiyasi)
- templates/trip_detail.html (Corrected Diagnostic Version)
+{% block javascript %}
+<script>
+    // JavaScript for the Tailwind Accordion
+    const accordionHeaders = document.querySelectorAll('.accordion-header');
 
+    accordionHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const content = header.nextElementSibling;
+            const arrow = header.querySelector('svg');
+
+            // Toggle the content visibility
+            if (content.style.maxHeight) {
+                // If it's open, close it
+                content.style.maxHeight = null;
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                // If it's closed, open it
+                content.style.maxHeight = content.scrollHeight + "px";
+                arrow.style.transform = 'rotate(180deg)';
+            }
+        });
+    });
+</script>
+{% endblock javascript %}

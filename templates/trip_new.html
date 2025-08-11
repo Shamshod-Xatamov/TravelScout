@@ -1,57 +1,73 @@
 <!-- templates/trip_new.html -->
 {% extends 'base.html' %}
-{% load crispy_forms_tags %} <!-- 1. LOAD THE TAGS -->
+{% load crispy_forms_tags %}
 
-{% block title %}Create Your AI Travel Plan{% endblock title %}
+{% block title %}Create a New Travel Plan{% endblock title %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-sm p-4">
-                <h1 class="text-center mb-4">Your AI-Powered Travel Scout</h1>
-                <p class="text-center text-muted mb-4">Fill out the details below and let AI plan your next adventure!</p>
+<div class="container mx-auto mt-8 px-4">
+    <div class="w-full max-w-2xl mx-auto">
 
-                <form method="post" id="plan-form">
-                    {% csrf_token %}
-                    {{ form|crispy }}
+        <div class="bg-[#1e293b] border border-gray-700 rounded-2xl shadow-lg p-8">
 
-                    <!-- Tugma va Spinner uchun maxsus joy -->
-                    <div class="d-grid gap-2 mt-3">
-                        <!-- 1. Asosiy tugma. Unga ID beramiz. -->
-                        <button type="submit" class="btn btn-success btn-lg" id="generate-button">
-                            Create My Plan
-                        </button>
-
-                        <!-- 2. Spinner. U boshida yashirin bo'ladi. -->
-                        <button class="btn btn-primary btn-lg d-none" type="button" disabled id="loading-spinner">
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            Generating... Please wait.
-                        </button>
-                    </div>
-                </form>
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-white">Create Your New Adventure</h1>
+                <p class="text-slate-400 mt-2">Fill out the details below and let our AI scout do the magic!</p>
             </div>
+
+            <!-- The form tag needs the id for the JavaScript to find it -->
+            <form method="post" id="plan-form">
+                {% csrf_token %}
+
+                <!-- The crispy tag will now render your beautiful, colorful form from the FormHelper -->
+                {% crispy form %}
+            </form>
         </div>
     </div>
 </div>
+{% endblock content %}
+
 {% block javascript %}
 <script>
-    // 1. Kerakli elementlarni topib olamiz
+    // Find the form using its ID.
     const planForm = document.getElementById('plan-form');
-    const generateButton = document.getElementById('generate-button');
-    const loadingSpinner = document.getElementById('loading-spinner');
 
-    // 2. Forma jo'natilganda (submit bo'lganda) ishlaydigan funksiya
-    planForm.addEventListener('submit', function() {
-        // Asosiy tugmani nofaol qilamiz (qayta bosishni oldini olish uchun)
-        generateButton.disabled = true;
+    if (planForm) {
+        // Find the submit button INSIDE the form.
+        // This selector looks for a <button type="submit"> OR an <input type="submit">
+        const submitButton = planForm.querySelector('button[type="submit"], input[type="submit"]');
 
-        // Asosiy tugmani yashiramiz
-        generateButton.classList.add('d-none');
+        if (submitButton) {
+            planForm.addEventListener('submit', function() {
+                // Disable the button to prevent multiple clicks
+                submitButton.disabled = true;
 
-        // Spinnerni ko'rsatamiz
-        loadingSpinner.classList.remove('d-none');
-    });
+                // Create the text for the loading state
+                const loadingText = document.createTextNode(' Generating...');
+
+                // Create the SVG spinner icon
+                const spinnerIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                spinnerIcon.setAttribute('class', 'animate-spin -ml-1 mr-3 h-5 w-5 text-black inline');
+                spinnerIcon.setAttribute('fill', 'none');
+                spinnerIcon.setAttribute('viewBox', '0 0 24 24');
+                spinnerIcon.innerHTML = `
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                `;
+
+                // Clear the button's current content
+                if (submitButton.tagName.toLowerCase() === 'button') {
+                    submitButton.innerHTML = '';
+                    submitButton.appendChild(spinnerIcon);
+                    submitButton.appendChild(loadingText);
+                } else { // It's an <input>
+                    submitButton.value = 'Generating...';
+                }
+
+                // Add a class to show it's loading
+                submitButton.classList.add('cursor-not-allowed');
+            });
+        }
+    }
 </script>
 {% endblock javascript %}
-{% endblock content %}
