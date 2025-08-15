@@ -100,7 +100,7 @@ class TripPlanCreateView(CreateView):
         form.instance.generated_plan = final_plan_text
         return super().form_valid(form)
 
-# ...
+
 
 class TripPlanUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     model = TripPlan
