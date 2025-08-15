@@ -10,9 +10,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="stylesheet" href="{% static 'css/custom_style.css' %}">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 
-
+    {% block head_extra %}
+    {% endblock head_extra %}
 
 
 </head>
@@ -37,11 +39,23 @@
                     <a class="transition-colors hover:text-cyan-400" href="{% url 'my_plans_list' %}">My Plans</a>
                     <a class="transition-colors hover:text-cyan-400" href="{% url 'trip_new' %}">New Plan</a>
 
-                    <!-- Chiqish tugmasi -->
-                    <form action="{% url 'logout' %}" method="post" class="inline">
-                        {% csrf_token %}
-                        <button type="submit" class="bg-transparent text-red-500 hover:text-red-400 font-medium">Log Out</button>
-                    </form>
+                     <!-- OCHILADIGAN MENYUNI QO'SHAMIZ -->
+                    <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                        <button @click="open = !open" class="flex items-center gap-2">
+                            <img class="h-8 w-8 rounded-full object-cover" src="{{ user.profile_picture.url }}" alt="Profile picture">
+                            <span class="text-white hover:text-cyan-400">{{ user.username }}</span>
+                            <svg class="w-4 h-4 text-gray-400" ...></svg> <!-- Strelka ikonka -->
+                        </button>
+
+                        <div x-show="open" class="absolute right-0 mt-2 w-48 bg-slate-800 rounded-md shadow-lg py-1 z-50">
+                            <a href="{% url 'profile_edit' %}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-slate-700">Edit Profile</a>
+                            <form action="{% url 'logout' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-slate-700">Log Out</button>
+                            </form>
+                        </div>
+                    </div>
+
 
                 {% else %}
                     <a class="transition-colors hover:text-cyan-400" href="{% url 'login' %}">Log In</a>

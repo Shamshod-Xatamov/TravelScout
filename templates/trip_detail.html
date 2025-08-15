@@ -1,48 +1,88 @@
-<!-- templates/trip_detail.html (Pure Tailwind CSS Version) -->
+<!-- templates/trip_detail.html -->
 {% extends 'base.html' %}
 {% load markdownify %}
+
+<!-- Google Maps API'sini faqat shu sahifa uchun yuklaymiz -->
+{% block head_extra %}
+    {% if google_maps_api_key %}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" defer async></script>
+    {% endif %}
+{% endblock head_extra %}
 
 {% block title %}Your Trip to {{ trip.destination }}{% endblock title %}
 
 {% block content %}
 <div class="container mx-auto mt-8 px-4 mb-8">
 
-    <!-- Main Title and Introduction -->
+    <!-- Sarlavha va Kirish qismi -->
     <div class="text-center mb-12">
         <h1 class="text-4xl md:text-5xl font-extrabold text-white">{{ plan_title|safe }}</h1>
         <p class="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">{{ plan_introduction|safe }}</p>
     </div>
 
-    <!-- Accordion built with Tailwind CSS and simple JavaScript -->
-    <div class="space-y-3 max-w-4xl mx-auto">
-        {% for day in days_list %}
-        <div class="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
-            <!-- Accordion Header -->
-            <button class="w-full flex justify-between items-center p-5 text-left text-white font-bold text-xl focus:outline-none accordion-header">
-                <span>{{ day.title|safe }}</span>
-                <!-- Arrow Icon -->
-                <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-            </button>
-            <!-- Accordion Content (Hidden by default) -->
-            <div class="accordion-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
-                <div class="p-5 border-t border-slate-700 text-slate-300">
-                    {{ day.content|markdownify|safe }}
+    <!-- Asosiy kontent: Reja, Xarita va Ob-havo -->
+    <div class="flex flex-col lg:flex-row gap-8">
+
+        <!-- CHAP USTUN: Akkordeon bilan reja (70% kenglik) -->
+        <div class="w-full lg:w-7/12">
+            <div class="space-y-3">
+                {% for day in days_list %}
+                <div class="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+                    <button class="w-full flex justify-between items-center p-5 text-left text-white font-bold text-xl focus:outline-none accordion-header">
+                        <span>{{ day.title|safe }}</span>
+                        <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+                        <div class="p-5 border-t border-slate-700 text-slate-300 prose prose-invert max-w-none">
+                            {{ day.content|markdownify|safe }}
+                        </div>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
+
+        <!-- O'NG USTUN: Xarita va Ob-havo (30% kenglik) -->
+        <div class="w-full lg:w-5/12">
+            <div class="sticky top-24 space-y-6"> <!-- 'sticky top-24' skroll qilganda joyida qolish uchun -->
+
+                <!-- Xarita Kartasi -->
+                {% if google_maps_api_key %}
+                <div class="bg-slate-800 border border-slate-700 rounded-lg shadow-lg">
+                    <div class="p-4 border-b border-slate-700">
+                        <h3 class="text-lg font-semibold text-white">Interactive Map</h3>
+                    </div>
+                    <div id="map" style="height: 350px; width: 100%;" class="rounded-b-lg"></div>
+                </div>
+                {% endif %}
+
+                <!-- Ob-havo Kartasi -->
+                {% if weather_forecast %}
+                <div class="bg-slate-800 border border-slate-700 rounded-lg shadow-lg">
+                    <div class="p-4 border-b border-slate-700">
+                        <h3 class="text-lg font-semibold text-white">Weather Forecast</h3>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        {% for forecast in weather_forecast|slice:":5" %} <!-- Faqat 5 kunlik prognozni ko'rsatamiz -->
+                        <div class="flex justify-between items-center text-slate-300">
+                            <span>{{ forecast.date_obj|date:"D, M d" }}</span>
+                            <span class="flex items-center gap-2">
+                                <img src="http://openweathermap.org/img/wn/{{ forecast.icon }}.png" alt="weather" class="w-8 h-8">
+                                <span class="font-bold">{{ forecast.temp|floatformat:0 }}°C</span>
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
-</div>
-
-    <!-- ====================================================== -->
-    <!--     MANA SHU YO'QOLGAN TUGMALAR BLOKINI QO'SHAMIZ       -->
-    <!-- ====================================================== -->
-    <div class="mt-8 text-center space-x-4">
+    <!-- Tugmalar bloki -->
+    <div class="mt-12 text-center space-x-2 md:space-x-4">
         {% if trip.user == user %}
-            <a href="{% url 'trip_pdf' pk=trip.pk %}" class="inline-block rounded-md bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-500">Download as PDF</a>
+            <a href="{% url 'trip_pdf' pk=trip.pk %}" class="inline-block rounded-md bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-500">Download PDF</a>
             <a href="{% url 'trip_edit' pk=trip.pk %}" class="inline-block rounded-md bg-yellow-500 px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-yellow-400">Edit & Regenerate</a>
             <a href="{% url 'trip_delete' pk=trip.pk %}" class="inline-block rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-500">Delete Plan</a>
         {% endif %}
@@ -50,32 +90,63 @@
     </div>
 
 </div>
-
-
-</div>
 {% endblock content %}
 
-{% block javascript %}
-<script>
-    // JavaScript for the Tailwind Accordion
-    const accordionHeaders = document.querySelectorAll('.accordion-header');
 
+{% block javascript %}
+<!-- Akkordeon va Xarita uchun JavaScript -->
+<script>
+    // 1. Akkordeon uchun kod
+    const accordionHeaders = document.querySelectorAll('.accordion-header');
     accordionHeaders.forEach(header => {
         header.addEventListener('click', () => {
             const content = header.nextElementSibling;
             const arrow = header.querySelector('svg');
-
-            // Toggle the content visibility
             if (content.style.maxHeight) {
-                // If it's open, close it
                 content.style.maxHeight = null;
                 arrow.style.transform = 'rotate(0deg)';
             } else {
-                // If it's closed, open it
+                // Avval boshqa ochiq bo'lganlarni yopamiz (ixtiyoriy)
+                // accordionHeaders.forEach(otherHeader => {
+                //     otherHeader.nextElementSibling.style.maxHeight = null;
+                //     otherHeader.querySelector('svg').style.transform = 'rotate(0deg)';
+                // });
                 content.style.maxHeight = content.scrollHeight + "px";
                 arrow.style.transform = 'rotate(180deg)';
             }
         });
     });
+
+    // 2. Google Maps uchun kod
+    const locations = JSON.parse('{{ locations_json|escapejs|default:"[]" }}');
+    let map;
+
+    function initMap() {
+        const mapElement = document.getElementById("map");
+        if (!mapElement) return;
+
+        if (locations.length > 0) {
+            const firstLocation = { lat: locations[0].lat, lng: locations[0].lng };
+            map = new google.maps.Map(mapElement, {
+                zoom: 11,
+                center: firstLocation,
+                mapId: 'YOUR_CUSTOM_MAP_ID' // Bu yerga o'zingizning Map ID'ni qo'yishingiz mumkin (ixtiyoriy)
+            });
+            locations.forEach(location => {
+                const marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: location.name,
+                });
+                const infowindow = new google.maps.InfoWindow({
+                    content: `<h6>${location.name}</h6>`,
+                });
+                marker.addListener("click", () => { infowindow.open(map, marker); });
+            });
+        } else {
+            // Agar koordinatalar bo'lmasa, xarita o'rniga xabar ko'rsatamiz
+            mapElement.innerHTML = "<p class='p-5 text-center text-slate-400'>No specific locations found in the plan to display on the map.</p>";
+        }
+    }
 </script>
 {% endblock javascript %}

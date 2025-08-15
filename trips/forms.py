@@ -16,6 +16,9 @@ class TripPlanForm(forms.ModelForm):
             'interests': 'What Excites You?',
             'budget': 'Your Travel Style',
         }
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,6 +45,7 @@ class TripPlanForm(forms.ModelForm):
                 ),
                 css_class='mb-6'
             ),
+
             Div(
                 Field(
                     'interests',
@@ -74,12 +78,15 @@ class TripPlanForm(forms.ModelForm):
 class TripPlanUpdateForm(forms.ModelForm):
     class Meta:
         model = TripPlan
-        fields = ['destination', 'duration_days', 'interests', 'budget']
+        fields = ['destination', 'duration_days','interests', 'budget']
         labels = {
             'destination': 'Your Amazing Destination',
             'duration_days': 'How Many Days of Adventure?',
             'interests': 'What Excites You?',
             'budget': 'Your Travel Style',
+        }
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
     def __init__(self, *args, **kwargs):

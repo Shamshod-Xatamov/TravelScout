@@ -14,6 +14,9 @@ python-dotenv = "*"
 weasyprint = "*"
 django-weasyprint = "*"
 crispy-tailwind = "*"
+pillow = "*"
+requests = "*"
+groq = "*"
 
 [dev-packages]
 

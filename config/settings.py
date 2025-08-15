@@ -145,12 +145,15 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 LOGIN_REDIRECT_URL = 'my_plans_list'
 LOGOUT_REDIRECT_URL = 'home'
 
-# Logout qilinganidan so'ng, ochiq bo'lgan bosh sahifaga qaytish
 
-# MANA SHU BLOKNI QO'SHING YOKI TO'G'RILANG:
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# Bu qator production uchun. Hozircha shu holatda turaversin.
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
