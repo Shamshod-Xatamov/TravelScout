@@ -13,6 +13,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from .forms import TripPlanForm,TripPlanUpdateForm
 import re
 import requests
+from django.db.models import Q
 import json
 try:
     groq_api_key = os.environ.get("GROQ_API_KEY")
@@ -186,7 +187,6 @@ class TripPlanDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         full_response_text = self.object.generated_plan
 
-        # Boshlang'ich qiymatlar
         itinerary_text = full_response_text
         locations_for_map = []
 
@@ -198,8 +198,7 @@ class TripPlanDetailView(LoginRequiredMixin, DetailView):
                 itinerary_text = parts[0].strip()  # Reja matni
                 locations_json_str = parts[1].strip()  # JSON satri
 
-                # AI'dan kelgan JSON satrini to'g'ridan-to'g'ri Python list'iga o'tkazamiz
-                # Endi Geoapify yoki boshqa tashqi servisga ehtiyoj yo'q!
+
                 locations_for_map = json.loads(locations_json_str)
                 print(f"INFO: {len(locations_for_map)} ta lokatsiya JSON'dan muvaffaqiyatli o'qildi.")
 
@@ -253,105 +252,33 @@ class TripPlanDetailView(LoginRequiredMixin, DetailView):
         context['google_maps_api_key'] = os.environ.get('GOOGLE_MAPS_API_KEY')
 
         return context
-class TripPlanListView(LoginRequiredMixin,ListView):
-    model=TripPlan
+
+
+class TripPlanListView(LoginRequiredMixin, ListView):
+    model = TripPlan
     template_name = 'my_plans.html'
     context_object_name = 'plans_list'
 
     def get_queryset(self):
-        return TripPlan.objects.filter(user=self.request.user).order_by('-created_at')
+
+        queryset = super().get_queryset().filter(user=self.request.user).order_by('-created_at')
+
+        search_query = self.request.GET.get('q')
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(destination__icontains=search_query) |
+                Q(generated_plan__icontains=search_query)
+            )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('q', '')
+        return context
 
 
-
-class TripPlanUpdateView(LoginRequiredMixin,UserPassesTestMixin,SuccessMessageMixin,UpdateView):
-    model=TripPlan
-    form_class = TripPlanUpdateForm
-    template_name = 'trip_edit.html'
-    success_message = "Your travel plan was updated successfully!"
-
-    def form_valid(self, form):
-        form.instance.user=self.request.user
-
-        destination=form.cleaned_data.get('destination')
-        duration = form.cleaned_data.get('duration_days')
-        interests = form.cleaned_data.get('interests')
-        budget = form.cleaned_data.get('budget')
-
-        ai_generated_plan = "Xatolik: Reja tuzib bo'lmadi. API kalitini tekshiring."
-        if client:
-            try:
-
-                prompt = f"""
-                                Act as a world-class, expert travel consultant named 'Scout'. Your tone is enthusiastic, helpful, and highly detailed. Your primary goal is to deliver a complete and comprehensive itinerary.
-                                code
-                                Code
-                                **Objective:** Generate a highly structured, personalized travel itinerary based on the user's preferences provided below.
-
-                                            **--- User Preferences ---**
-                                            *   **Destination:** {destination}
-                                            *   **Trip Duration:** {duration} days
-                                            *   **Primary Interests:** {interests}
-                                            *   **Budget Level:** {budget} (Interpret this as: Ekonom = $, Standart = $$, Lyuks = $$$)
-
-                                            **--- CRITICAL INSTRUCTIONS (Must be followed exactly) ---**
-                                            1.  **Full Duration:** You MUST generate a plan for the **ENTIRE duration of {duration} days**.
-                                            2.  **Location Highlighting:** For every specific, real-world, plottable location name (a museum, monument, specific restaurant, park, or station), you MUST wrap it in double asterisks.
-                                                - **DO NOT** make the labels like "Activity:", "Cost:", or "Food Stop:" bold. Only the names themselves.
-                                                - **Correct Example:** "Activity: Visit the **Eiffel Tower**."
-                                                - **Incorrect Example:** "**Activity:** Visit the Eiffel Tower."
-
-                                            **--- Strict Output Requirements ---**
-
-                                            **1. Main Title (H1):**
-                                               - Start with a single, creative, and exciting title for the entire trip.
-
-                                            **2. Introduction (Paragraph):**
-                                               - Write a short (2-3 sentences), welcoming paragraph that builds excitement.
-
-                                            **3. Day-by-Day Itinerary (Main Body):**
-                                               - For **every single day** from Day 1 to Day {duration}:
-                                                 - Create a heading: `## Day X: [Creative Day Title]`
-                                                 - Structure the day into `### Morning`, `### Afternoon`, and `### Evening`.
-                                                 - In a bulleted list, provide:
-                                                   - **Activity:** A specific activity, featuring highlighted locations like **[Location Name]**.
-                                                   - **Time:** An estimated time allocation (e.g., "9:00 AM - 12:00 PM").
-                                                   - **Cost:** An estimated cost in local currency and USD.
-                                                   - **Description:** A brief, compelling description.
-                                                   - **Scout's Tip:** A practical, insider tip.
-
-                                            **4. Daily Summary Section (at the end of each day's plan):**
-                                               - **Food Stop:** Suggest one specific, highlighted restaurant: **[Restaurant Name]**.
-                                               - **Transport:** Recommend the best mode of transport for that day's plan.
-
-                                            **5. Overall Trip Summary (at the very end):**
-                                               - **Budget Overview:** A rough total estimated cost for activities.
-                                               - **General Tips:** 2-3 general tips for the destination.
-
-                                            **6. Formatting Rules (Crucial):**
-                                               - Use Markdown extensively and consistently.
-                                               - **DO NOT** include any conversational filler like "Here is your plan:". Start directly with the Main Title. The entire output must be only the itinerary itself.
-                                            **--- FINAL REQUIREMENT ---**
-                                At the very end of your entire response, after everything else, add a section that starts with `LOCATIONS_LIST:` followed by a comma-separated list of all the plottable location names you mentioned. Do not use bolding or any other formatting in this list.
-                                Example:
-                                LOCATIONS_LIST: Eiffel Tower, Louvre Museum, Le Procope, Champ de Mars"""
-                chat_completion = client.chat.completions.create(
-                    messages=[
-                        {"role": "user", "content": prompt}
-                    ],
-                    model="llama3-8b-8192",
-                )
-                ai_generated_plan = chat_completion.choices[0].message.content
-            except Exception as e:
-                print(f"Error calling Groq API: {e}")
-                ai_generated_plan = f"An error occurred while generating the plan: {e}"
-
-        form.instance.generated_plan = ai_generated_plan
-        return super().form_valid(form)
-
-
-    def test_func(self):
-        plan=self.get_object()
-        return self.request.user==plan.user
 
 class TripPlanDeleteView(LoginRequiredMixin,UserPassesTestMixin,SuccessMessageMixin,DeleteView):
     model=TripPlan

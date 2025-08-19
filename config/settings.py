@@ -49,9 +49,11 @@ INSTALLED_APPS = [
     'crispy_tailwind',  # <-- ADD THIS
     'markdownify',
 
+
     #men ozim yaratgan applar
     'accounts',
     'trips',
+    'flights'
 ]
 
 MIDDLEWARE = [
@@ -153,6 +155,7 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 MEDIA_URL = '/media/'
