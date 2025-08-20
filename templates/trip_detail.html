@@ -18,6 +18,41 @@
     <div class="text-center mb-12">
         <h1 class="text-4xl md:text-5xl font-extrabold text-white">{{ plan_title|safe }}</h1>
         <p class="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">{{ plan_introduction|safe }}</p>
+         {% if user.is_authenticated and user == trip.user %}
+    <!-- Bu blok faqat reja egasiga ko'rinadi -->
+    <div
+        x-data="{
+            shareLink: '{{ request.scheme }}://{{ request.get_host }}{{ trip.get_share_url }}',
+            copied: false
+        }"
+        class="max-w-2xl mx-auto my-6 bg-slate-800 border border-gray-700 rounded-lg p-4 text-center"
+    >
+        <h3 class="text-lg font-semibold text-white mb-2">Share this plan!</h3>
+        <p class="text-sm text-gray-400 mb-3">Anyone with this link can view your plan (map is interactive!).</p>
+        <div class="flex items-center justify-center bg-slate-900 rounded-md p-2">
+            <input
+                type="text"
+                readonly
+                :value="shareLink"
+                class="bg-transparent text-gray-300 w-full border-none focus:ring-0"
+                id="share-link-input"
+            >
+            <button
+                @click="
+                    navigator.clipboard.writeText(shareLink);
+                    copied = true;
+                    setTimeout(() => copied = false, 2000);
+                "
+                class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-1 px-3 rounded-md ml-2 flex-shrink-0"
+            >
+                <span x-show="!copied">Copy</span>
+                <span x-show="copied" style="display: none;">Copied!</span>
+            </button>
+        </div>
+    </div>
+    {% endif %}
+    <!-- === "SHARE" BLOKI TUGADI === -->
+
     </div>
 
     <!-- Asosiy kontent: Reja, Xarita va Ob-havo -->

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About TravelScout AI{% endblock title %}
+
+{% block content %}
+<div class="bg-slate-900 text-white">
+
+    <!-- ======================= 1. HERO SECTION ======================= -->
+    <section class="relative text-center py-20 md:py-32 overflow-hidden">
+        <!-- Background Image/Effect -->
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2070&auto=format&fit=crop');">
+            <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"></div>
+        </div>
+
+        <div class="container mx-auto px-4 relative">
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white animate-fade-in-down">
+                Stop Dreaming, <span class="text-cyan-400">Start Exploring.</span>
+            </h1>
+            <p class="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-slate-300 animate-fade-in-up">
+                Welcome to TravelScout, your personal AI travel architect. We transform your travel ideas into perfectly crafted, personalized itineraries in seconds, so you can spend less time planning and more time experiencing the world.
+            </p>
+        </div>
+    </section>
+
+    <!-- ======================= 2. HOW IT WORKS SECTION ======================= -->
+    <section class="py-16 md:py-24 bg-slate-800/50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold tracking-tight">How It Works</h2>
+                <p class="text-slate-400 mt-2">Crafting your perfect journey in three simple steps.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <!-- Step 1 -->
+                <div class="border border-slate-700 p-8 rounded-xl bg-slate-800 transition-all hover:border-cyan-500/50 hover:shadow-cyan-500/10">
+                    <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-cyan-400/10 text-cyan-400 mb-4">
+                        <span class="text-2xl font-bold">1</span>
+                    </div>
+                    <h3 class="text-xl font-semibold">Tell Us Your Dream</h3>
+                    <p class="mt-2 text-slate-400">Simply enter your destination, duration, interests, and budget. The more details, the more personal your plan.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="border border-slate-700 p-8 rounded-xl bg-slate-800 transition-all hover:border-cyan-500/50 hover:shadow-cyan-500/10">
+                    <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-cyan-400/10 text-cyan-400 mb-4">
+                        <span class="text-2xl font-bold">2</span>
+                    </div>
+                    <h3 class="text-xl font-semibold">Let AI Do The Magic</h3>
+                    <p class="mt-2 text-slate-400">Our AI, 'Scout', instantly builds a unique, day-by-day itinerary complete with activities, tips, and costs.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="border border-slate-700 p-8 rounded-xl bg-slate-800 transition-all hover:border-cyan-500/50 hover:shadow-cyan-500/10">
+                     <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-cyan-400/10 text-cyan-400 mb-4">
+                        <span class="text-2xl font-bold">3</span>
+                    </div>
+                    <h3 class="text-xl font-semibold">Explore & Share</h3>
+                    <p class="mt-2 text-slate-400">View your plan on an interactive map, download it as a PDF, and share your perfect adventure with friends.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= 3. OUR PHILOSOPHY SECTION ======================= -->
+    <section class="py-16 md:py-24">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl font-bold tracking-tight">Travel Should Be About <span class="text-cyan-400">Freedom</span>, Not Spreadsheets.</h2>
+                <p class="mt-6 text-lg text-slate-300">
+                    We are a team of travelers and tech enthusiasts who got tired of the old way of planning trips—endless browser tabs, confusing spreadsheets, and the fear of missing out. TravelScout was born from a simple idea: what if a smart, friendly assistant could handle all the heavy lifting? We're not just building a tool; we're building a companion for your curiosity.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= 4. CALL TO ACTION (CTA) SECTION ======================= -->
+    <section class="py-16 md:py-24 bg-gradient-to-t from-slate-900 to-slate-800/50">
+        <div class="container mx-auto px-4">
+            <div class="bg-slate-800 rounded-2xl p-10 text-center shadow-2xl border border-slate-700">
+                <h2 class="text-3xl font-bold text-white">Ready to Plan Your Next Adventure?</h2>
+                <p class="mt-3 text-slate-400">Your journey of a thousand miles begins with a single click.</p>
+                <div class="mt-8">
+                    <a href="{% if user.is_authenticated %}{% url 'trip_new' %}{% else %}{% url 'signup' %}{% endif %}" class="inline-block rounded-lg bg-cyan-500 px-8 py-3 text-base font-semibold text-black transition-transform hover:bg-cyan-400 hover:scale-105">
+                        Get Started for Free
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Animatsiyalar uchun kichik CSS qo'shimchasi -->
+<style>
+    @keyframes fade-in-down {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-down {
+        animation: fade-in-down 0.8s ease-out forwards;
+    }
+
+    @keyframes fade-in-up {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+        animation: fade-in-up 0.8s ease-out 0.2s forwards;
+        opacity: 0;
+    }
+</style>
+{% endblock content %}

@@ -29,6 +29,9 @@ except Exception as e:
 class HomePageView(TemplateView):
     template_name = 'home.html'
 
+class AboutPageView(TemplateView):
+    template_name = "about.html"
+
 class TripPlanCreateView(CreateView):
     model = TripPlan
     form_class = TripPlanForm
@@ -315,3 +318,81 @@ def trip_plan_pdf_view(request, pk):
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="trip_plan_{trip_plan.destination}.pdf"'
     return response
+
+
+class PublicPlanDetailView(DetailView):
+    model = TripPlan
+    template_name = 'trip_detail.html'
+    context_object_name = 'trip'
+    slug_field = 'share_id'
+    slug_url_kwarg = 'share_id'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        full_response_text = self.object.generated_plan
+
+        itinerary_text = full_response_text
+        locations_for_map = []
+
+        # --- 1. MATNDAN JSON QISMINI AJRATIB OLISH VA PARSE QILISH (YANGI USUL) ---
+        try:
+            # `LOCATIONS_JSON:` markerini qidiramiz
+            if "LOCATIONS_JSON:" in full_response_text:
+                parts = full_response_text.split("LOCATIONS_JSON:", 1)
+                itinerary_text = parts[0].strip()  # Reja matni
+                locations_json_str = parts[1].strip()  # JSON satri
+
+
+                locations_for_map = json.loads(locations_json_str)
+                print(f"INFO: {len(locations_for_map)} ta lokatsiya JSON'dan muvaffaqiyatli o'qildi.")
+
+            else:
+                print("WARNING: 'LOCATIONS_JSON' marker AI javobida topilmadi.")
+
+        except json.JSONDecodeError as e:
+            print(f"ERROR: AI'dan kelgan JSON'ni o'qishda xatolik: {e}")
+        except Exception as e:
+            print(f"ERROR: Lokatsiyalarni ajratib olishda kutilmagan xatolik: {e}")
+
+        # --- 2. MATN QISMINI SARLAVHA, KIRISH VA KUNLARGA AJRATISH (O'ZGARISHSIZ QOLADI) ---
+        context['plan_title'] = "Your Travel Plan"
+        context['plan_introduction'] = ""
+        context['days_list'] = []
+
+        try:
+            day_sections = re.split(r'\n##\s+', itinerary_text)
+            if day_sections:
+                header_part = day_sections.pop(0).strip()
+                header_lines = header_part.split('\n', 1)
+                context['plan_title'] = header_lines[0].replace('#', '').strip()
+                if len(header_lines) > 1:
+                    context['plan_introduction'] = header_lines[1].strip()
+
+                days_list = []
+                for section in day_sections:
+                    if section.strip():
+                        parts = section.split('\n', 1)
+                        day_title = parts[0].strip()
+                        day_content = parts[1].strip() if len(parts) > 1 else ""
+                        days_list.append({'title': day_title, 'content': day_content})
+                context['days_list'] = days_list
+        except Exception as e:
+            print(f"ERROR: Reja matnini parsing qilishda xatolik: {e}")
+            context['days_list'] = [{'title': 'Full Itinerary', 'content': itinerary_text}]
+
+        # Sarlavha va kirish qismini tozalash (o'zgarishsiz qoladi)
+        if context.get('plan_title'):
+            context['plan_title'] = context['plan_title'].replace('**', '').strip()
+        if context.get('plan_introduction'):
+            intro_lines = context['plan_introduction'].split('\n')
+            cleaned_lines = [
+                line for line in intro_lines
+                if not line.strip().startswith('===') and not line.strip().startswith('---')
+            ]
+            context['plan_introduction'] = "\n".join(cleaned_lines).strip()
+
+        # --- 3. YAKUNIY MA'LUMOTLARNI KONTEKSTGA QO'SHISH ---
+        context['locations_json'] = json.dumps(locations_for_map)  # Bu endi to'g'ridan-to'g'ri AI'dan kelgan ma'lumot
+        context['google_maps_api_key'] = os.environ.get('GOOGLE_MAPS_API_KEY')
+
+        return context

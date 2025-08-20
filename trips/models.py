@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
-
+import uuid
 class TripPlan(models.Model):
     BUDGET_CHOICES=[
         ('Economy','Economy'),
@@ -26,8 +26,12 @@ class TripPlan(models.Model):
     generated_plan=models.TextField(blank=True)
 
     created_at=models.DateTimeField(auto_now_add=True)
+    share_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def __str__(self):
         return f"Sayohat rejasi: {self.destination})"
     def get_absolute_url(self):
         return reverse('trip_detail',args=[str(self.id)])
+
+    def get_share_url(self):
+        return reverse("public_plan_detail", kwargs={"share_id": self.share_id})
