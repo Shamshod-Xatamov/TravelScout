@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     #men ozim yaratgan applar
     'accounts',
     'trips',
-    'flights'
+    'flights',
+    'support',
 ]
 
 MIDDLEWARE = [
@@ -159,7 +160,7 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

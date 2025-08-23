@@ -16,18 +16,37 @@
 
     <style>
         .body-with-bg {
-            /* BU YERGA O'ZINGIZGA YOQQAN RASM MANZILINI QO'YING (TO'G'RI FORMATDA) */
-            background-image: url('https://i.pinimg.com/1200x/d0/34/75/d03475000872cb9c61e8736c861dedee.jpg');
+
+            background-image: url('https://images.unsplash.com/photo-1505832018823-50331d70d237?q=80&w=1208&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
             background-size: cover;
             background-attachment: fixed;
             background-position: center center;
         }
+        .blur-overlay {
+            position: fixed; /* Stays in one place */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+
+            /* The magic line: applies a blur effect to whatever is BEHIND it */
+            backdrop-filter: blur(8px); /* You can change 8px to 4px, 12px, etc. to control the blur amount */
+            -webkit-backdrop-filter: blur(8px); /* For Safari browser support */
+
+            /* A subtle dark tint on top of the blur to make text more readable */
+            background-color: rgba(15, 23, 42, 0.3); /* This is `bg-slate-900` with 30% opacity */
+
+            z-index: -1; /* P
     </style>
 </head>
 
 <body class="bg-slate-900 text-gray-3300 {% if request.path != '/' %}body-with-bg{% endif %}">
+    <!-- === NEW BLUR OVERLAY DIV === -->
+    {% if request.path != '/' %}
+        <div class="blur-overlay"></div>
+    {% endif %}
 
-    <!-- ======================= NAVBAR (SHART BILAN) ======================= -->
+
     {% if request.path != '/' %}
     <header class="bg-slate-900/80 backdrop-blur-sm text-white/90 sticky top-0 z-50 border-b border-gray-800">
         <div class="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
@@ -39,6 +58,7 @@
             <!-- O'ngdagi Menyular -->
             <nav class="hidden items-center gap-6 text-sm font-medium md:flex">
                 <a class="transition-colors hover:text-cyan-400" href="{% url 'about' %}">About</a>
+                <a class="transition-colors hover:text-cyan-400" href="{% url 'support:contact' %}">Support</a>
                 <a class="transition-colors hover:text-cyan-400" href="{% url 'flights:flight_search' %}">Flight Finder</a>
                 {% if user.is_authenticated %}
                     <a class="transition-colors hover:text-cyan-400" href="{% url 'my_plans_list' %}">My Plans</a>

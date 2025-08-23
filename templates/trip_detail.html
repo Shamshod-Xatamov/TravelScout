@@ -90,26 +90,6 @@
                     <div id="map" style="height: 350px; width: 100%;" class="rounded-b-lg"></div>
                 </div>
                 {% endif %}
-
-                <!-- Ob-havo Kartasi -->
-                {% if weather_forecast %}
-                <div class="bg-slate-800 border border-slate-700 rounded-lg shadow-lg">
-                    <div class="p-4 border-b border-slate-700">
-                        <h3 class="text-lg font-semibold text-white">Weather Forecast</h3>
-                    </div>
-                    <div class="p-4 space-y-3">
-                        {% for forecast in weather_forecast|slice:":5" %} <!-- Faqat 5 kunlik prognozni ko'rsatamiz -->
-                        <div class="flex justify-between items-center text-slate-300">
-                            <span>{{ forecast.date_obj|date:"D, M d" }}</span>
-                            <span class="flex items-center gap-2">
-                                <img src="http://openweathermap.org/img/wn/{{ forecast.icon }}.png" alt="weather" class="w-8 h-8">
-                                <span class="font-bold">{{ forecast.temp|floatformat:0 }}°C</span>
-                            </span>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -129,7 +109,7 @@
 
 
 {% block javascript %}
-<!-- Akkordeon va Xarita uchun JavaScript -->
+
 <script>
     // 1. Akkordeon uchun kod
     const accordionHeaders = document.querySelectorAll('.accordion-header');

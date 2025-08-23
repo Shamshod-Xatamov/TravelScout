@@ -8,7 +8,7 @@ API_KEY = os.environ.get("AMADEUS_API_KEY")
 API_SECRET = os.environ.get("AMADEUS_API_SECRET")
 
 
-# Token olish funksiyasi (o'zgarishsiz)
+
 def get_amadeus_access_token():
     endpoint = "https://test.api.amadeus.com/v1/security/oauth2/token"
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
