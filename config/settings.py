@@ -36,6 +36,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     '172.20.10.2',
+
+    'https://83275c5d6a009b.lhr.life',
 ]
 
 
