@@ -37,8 +37,13 @@ ALLOWED_HOSTS = [
     'localhost',
     '172.20.10.2',
 
-    'https://83275c5d6a009b.lhr.life',
 ]
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+ALLOWED_HOSTS.append('travelscout-ai.onrender.com')
 
 
 # Application definition
