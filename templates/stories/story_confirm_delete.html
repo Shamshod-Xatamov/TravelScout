@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Deletion{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto mt-8 px-4 mb-12">
+    <!-- WRAP EVERYTHING IN OUR BLURRED CANVAS FOR CONSISTENCY -->
+    <div class="max-w-2xl mx-auto bg-slate-900/80 backdrop-blur-lg rounded-xl p-8 md:p-12 border border-slate-700 text-center">
+
+        <!-- 1. ADD A WARNING ICON -->
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-900/50 mb-6">
+            <svg class="h-8 w-8 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
+            </svg>
+        </div>
+
+        <!-- 2. IMPROVE TYPOGRAPHY -->
+        <h1 class="text-3xl font-extrabold text-white mb-4">Confirm Deletion</h1>
+        <p class="text-slate-300 mb-8 max-w-md mx-auto">
+            Are you sure you want to permanently delete the story titled
+            <strong class="block mt-2 text-lg text-white font-semibold">"{{ story.title }}"</strong>?
+            <br>
+            <span class="text-red-400 font-bold mt-2 inline-block">This action cannot be undone.</span>
+        </p>
+
+        <!-- 3. ENHANCE THE BUTTONS -->
+        <form method="post">
+            {% csrf_token %}
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <!-- "Cancel" button is now more subtle -->
+                <a href="{{ story.get_absolute_url }}" class="w-full sm:w-auto bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-8 rounded-lg transition-colors">
+                    Cancel
+                </a>
+                <!-- "Delete" button is more impactful -->
+                <button type="submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-red-500 text-white font-bold py-3 px-8 rounded-lg transition-colors">
+                    Yes, Delete Forever
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock content %}

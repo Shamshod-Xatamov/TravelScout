@@ -50,8 +50,7 @@ class TripPlanCreateView(CreateView):
 
         if client:
             try:
-                # --- Yagona, KUCHAYTIRILGAN PROMPT ---
-                # Endi biz AI'dan ham marshrut, ham JSON formatidagi geolokatsiyalarni bitta so'rovda olamiz.
+
                 unified_prompt = f"""
                 Act as a world-class, expert travel consultant named 'Scout'. Your tone is enthusiastic, helpful, and highly detailed.
                 Your entire response MUST be in English and formatted in Markdown.
@@ -91,7 +90,7 @@ class TripPlanCreateView(CreateView):
 
                 completion = client.chat.completions.create(
                     messages=[{"role": "user", "content": unified_prompt}],
-                    model="llama3-70b-8192",  # Yoki kuchliroq model
+                    model="gemma-7b-it",
                     temperature=0.7,
                 )
                 final_plan_text = completion.choices[0].message.content

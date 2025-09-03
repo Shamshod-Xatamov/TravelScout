@@ -63,7 +63,7 @@ class TripPlanForm(forms.ModelForm):
                 css_class='mb-6'
             ),
 
-            # HTML yordamida ajratuvchi chiziq qo'shamiz
+
             HTML('<hr class="border-gray-600 my-6">'),
 
             # The new, improved Submit button

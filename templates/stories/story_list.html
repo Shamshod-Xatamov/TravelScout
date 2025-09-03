@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Travel Stories{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto mt-8 px-4 mb-12">
+        <div class="max-w-5xl mx-auto mb-10 text-center bg-slate-800/50 backdrop-blur-md rounded-xl p-8 border border-slate-700">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight">Travel Stories</h1>
+        <p class="mt-4 text-lg text-slate-300">Discover amazing journeys from our community.</p>
+
+        <!-- "Yangi Post Yozish" tugmasini ham shu blokning ichiga olamiz -->
+        <div class="mt-6">
+            <a href="{% url 'stories:story_new' %}" class="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold py-2 px-5 rounded-lg transition-colors inline-block">
+                + Share Your Story
+            </a>
+        </div>
+    </div>
+
+    <!-- KONTENT UCHUN XIRA FONLI "KANVAS" -->
+    <div class="max-w-5xl mx-auto bg-slate-900/70 backdrop-blur-md rounded-xl p-6 md:p-10 border border-slate-700">
+
+        <!-- POSTLAR LENTASI -->
+        <div class="space-y-12"> <!-- Postlar orasidagi vertikal masofa -->
+
+            {% for story in stories %}
+                <!-- HAR BIR POST UCHUN TO'LIQ STRUKTURA -->
+                <article class="group grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+
+                    <!-- CHAP USTUN (MUALLIF) -->
+                    <div class="md:col-span-1 flex flex-col items-center md:items-start text-center md:text-left">
+                        <a href="#"> <!-- Kelajakda muallif profiliga link -->
+                            <img src="{{ story.author.profile_picture.url }}" alt="{{ story.author.username }}" class="h-16 w-16 rounded-full object-cover mb-3">
+                        </a>
+                        <a href="#" class="font-bold text-white text-lg hover:text-cyan-400 transition">{{ story.author.username }}</a>
+
+                        <!-- Ikonkalar bilan meta-ma'lumot -->
+                        <div class="mt-2 space-y-1 text-sm text-slate-400">
+                            <div class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                <span>{{ story.created_at|date:"F j, Y" }}</span>
+                            </div>
+                            {% if story.location %}
+                            <div class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                <span>{{ story.location }}</span>
+                            </div>
+                            {% endif %}
+                             <div class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <span>{{ story.view_count }} views</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                                <!-- The magic is story.likes.count -->
+                                <span>{{ story.likes.count }} {% if story.likes.count == 1 %}like{% else %}likes{% endif %}</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- O'NG USTUN (KONTENT) -->
+                    <div class="md:col-span-2">
+                        <a href="{{ story.get_absolute_url }}">
+                            <h2 class="text-3xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors duration-300">
+                                {{ story.title }}
+                            </h2>
+                        </a>
+                        {% if story.cover_image %}
+                        <a href="{{ story.get_absolute_url }}">
+                            <img src="{{ story.cover_image.url }}" alt="{{ story.title }}"
+                                 class="w-full h-auto rounded-lg mb-4 object-cover border border-slate-700">
+                        </a>
+                        {% endif %}
+                        <div class="text-white leading-relaxed">
+                            <p>
+                                {{ story.content|truncatewords:40|safe }}
+                            </p>
+                        </div>
+                        <a href="{{ story.get_absolute_url }}" class="text-cyan-400 hover:text-cyan-300 font-semibold inline-block">
+                            Read more &rarr;
+                        </a>
+                    </div>
+                </article>
+
+                {% if not forloop.last %}
+                    <hr class="border-slate-700/50">
+                {% endif %}
+
+            {% empty %}
+                <div class="text-center py-12">
+                     <p class="text-slate-400 text-lg">No stories have been written yet. Be the first to share your adventure!</p>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+{% endblock content %}

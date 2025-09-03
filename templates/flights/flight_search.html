@@ -16,7 +16,7 @@
         <form method="GET" action="{% url 'flights:flight_search' %}" id="flight-search-form">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <!-- === "FROM" MAYDONI TO'G'RILANDI === -->
+
                 <div>
                     <label for="fly_from" class="block text-sm font-medium text-slate-300 mb-1">From</label>
                     <input type="text" name="fly_from" id="fly_from" value="{{ search_params.fly_from }}" required placeholder="e.g., TAS"
@@ -24,7 +24,7 @@
                            maxlength="3" style="text-transform: uppercase;">
                 </div>
 
-                <!-- === "TO" MAYDONI TO'G'RILANDI === -->
+
                 <div>
                     <label for="fly_to" class="block text-sm font-medium text-slate-300 mb-1">To</label>
                     <input type="text" name="fly_to" id="fly_to" value="{{ search_params.fly_to }}" required placeholder="e.g., JFK"
@@ -54,7 +54,7 @@
                 </div>
             </div>
         </form>
-        <!-- === YORDAMCHI MATN QO'SHILDI === -->
+
         <p class="text-xs text-gray-500 text-center mt-4">
             Please use 3-letter IATA airport codes (e.g., Tashkent -> TAS).
         </p>

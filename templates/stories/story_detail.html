@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load markdownify %}
+
+{% block title %}{{ story.title }}{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto mt-8 px-4 mb-12">
+    {% if messages %}
+        <div class="container mx-auto mt-4 px-4 max-w-5xl">
+            {% for message in messages %}
+                <div class="p-4 mb-4 text-sm rounded-lg
+                    {% if message.tags == 'success' %} bg-green-200 text-green-800 {% endif %}
+                    {% if message.tags == 'error' %} bg-red-200 text-red-800 {% endif %}
+                    " role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="max-w-4xl mx-auto bg-slate-900/80 backdrop-blur-lg rounded-xl p-6 md:p-10 border border-slate-700">
+
+        {% if story.cover_image %}
+            <img src="{{ story.cover_image.url }}" alt="{{ story.title }}" class="w-full h-auto max-h-[500px] object-cover rounded-lg mb-8">
+        {% endif %}
+
+
+        <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">{{ story.title }}</h1>
+                {% if story.author == user %}
+            <div
+                x-data="{
+                    shareLink: '{{ request.scheme }}://{{ request.get_host }}{% url 'stories:story_share' share_id=story.share_id %}',
+                    copied: false
+                }"
+                class="my-6 bg-slate-800/50 border border-slate-700 rounded-lg p-4"
+            >
+                <h3 class="text-lg font-semibold text-white mb-2">Share this Story!</h3>
+                <p class="text-sm text-gray-400 mb-3">Anyone with this link can view your story.</p>
+                <div class="flex items-center justify-center bg-slate-900 rounded-md p-2">
+                    <input type="text" readonly :value="shareLink" class="bg-transparent text-gray-300 w-full border-none focus:ring-0">
+                    <button
+                        @click="
+                            navigator.clipboard.writeText(shareLink);
+                            copied = true;
+                            setTimeout(() => copied = false, 2000);
+                        "
+                        class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-1 px-3 rounded-md ml-2 flex-shrink-0"
+                    >
+                        <span x-show="!copied">Copy</span>
+                        <span x-show="copied" style="display: none;">Copied!</span>
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+
+
+        <div class="flex items-center gap-4 text-slate-400 mb-8 border-b border-t border-slate-700 py-4">
+            <a href="#">
+                <img src="{{ story.author.profile_picture.url }}" alt="{{ story.author.username }}" class="h-12 w-12 rounded-full object-cover">
+            </a>
+            <div>
+                <a href="#" class="font-semibold text-white hover:text-cyan-400 transition">{{ story.author.username }}</a>
+                <p class="text-sm">
+                    <span>{{ story.created_at|date:"F j, Y" }}</span>
+                    {% if story.location %}
+                        <span class="mx-1">&middot;</span>
+                        <span>{{ story.location }}</span>
+                        <span class="mx-1">&middot;</span>
+                        <span>{{ story.view_count }} views</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+             <div class="bg-slate-800/20 backdrop-blur-sm rounded-lg border border-slate-700/50 p-6 md:p-8">
+                <div class="prose prose-invert prose-lg max-w-none text-slate-200 leading-relaxed">
+                    {{ story.content|safe }}
+                </div>
+            </div>
+         <div class="mt-8 pt-6 border-t border-slate-700 flex items-center gap-4">
+
+                {% if user.is_authenticated %}
+                    {% if user in story.likes.all %}
+                        {% include 'stories/partials/unlike_button.html' %}
+                    {% else %}
+                        {% include 'stories/partials/like_button.html' %}
+                    {% endif %}
+                {% else %}
+                    <p class="text-slate-200">
+                        Please <a href="{% url 'login' %}?next={{ request.path }}" class="text-cyan-400 font-bold hover:underline">log in</a> to like this story.
+                        <span class="text-slate-400 ml-4">{{ story.likes.count }} likes</span>
+                    </p>
+                {% endif %}
+
+            </div>
+        {% if story.author == user %}
+            <div class="mt-8 pt-6 border-t border-slate-700 flex items-center gap-4">
+                <a href="{% url 'stories:story_edit' pk=story.pk %}" class="bg-yellow-500 hover:bg-yellow-400 text-black font-semibold py-2 px-5 rounded-lg transition-colors">
+                    Edit Story
+                </a>
+                <a href="{% url 'stories:story_delete' pk=story.pk %}" class="bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-5 rounded-lg transition-colors">
+                    Delete
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-8 text-center">
+        <a href="{% url 'stories:story_list' %}" class="inline-block rounded-md bg-gray-700/50 hover:bg-gray-600/70 px-6 py-3 text-sm font-semibold text-white transition-colors">
+            &larr; Back to All Stories
+        </a>
+    </div>
+
+</div>
+{% endblock content %}

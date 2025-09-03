@@ -53,14 +53,12 @@ def flight_search_view(request):
             api_data = response.json()
 
             flights = []
-            # Javobdagi "lug'at"ni olib olamiz
             carriers_dict = api_data.get('dictionaries', {}).get('carriers', {})
 
             for offer in api_data.get('data', []):
-                # Har bir taklif uchun ma'lumotlarni xavfsiz yo'l bilan ajratib olamiz
                 try:
                     itinerary = offer['itineraries'][0]
-                    segment = itinerary['segments'][0]  # Birinchi segmentni olamiz
+                    segment = itinerary['segments'][0]
 
                     # Aviakompaniya nomini lug'atdan topamiz
                     carrier_code = segment.get('carrierCode')
@@ -75,7 +73,7 @@ def flight_search_view(request):
                         'deep_link': f"https://www.google.com/flights?q={fly_from_iata} to {fly_to_iata} on {date_from_str}",
                     })
                 except (KeyError, IndexError) as e:
-                    # Agar biror taklifning strukturasi kutilmagandek bo'lsa, uni o'tkazib yuboramiz
+
                     print(f"Skipping an offer due to parsing error: {e}")
                     continue
 

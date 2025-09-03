@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="{% static 'css/custom_style.css' %}?v=1.1">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
 
     {% block head_extra %}
     {% endblock head_extra %}
@@ -32,7 +33,7 @@
 
             /* The magic line: applies a blur effect to whatever is BEHIND it */
             backdrop-filter: blur(8px); /* You can change 8px to 4px, 12px, etc. to control the blur amount */
-            -webkit-backdrop-filter: blur(8px); /* For Safari browser support */
+            -webkit-backdrop-filter: blur(4px); /* For Safari browser support */
 
             /* A subtle dark tint on top of the blur to make text more readable */
             background-color: rgba(15, 23, 42, 0.3); /* This is `bg-slate-900` with 30% opacity */
@@ -59,7 +60,10 @@
             <!-- O'ngdagi Menyular -->
             <nav class="hidden items-center gap-6 text-sm font-medium md:flex">
                 <a class="transition-colors hover:text-cyan-400" href="{% url 'about' %}">About</a>
+
                 <a class="transition-colors hover:text-cyan-400" href="{% url 'support:contact' %}">Support</a>
+                <a class="transition-colors hover:text-cyan-400" href="{% url 'stories:story_list' %}">Travel Stories</a>
+
                 <a class="transition-colors hover:text-cyan-400" href="{% url 'flights:flight_search' %}">Flight Finder</a>
                 {% if user.is_authenticated %}
                     <a class="transition-colors hover:text-cyan-400" href="{% url 'my_plans_list' %}">My Plans</a>
@@ -95,15 +99,20 @@
     </header>
     {% endif %}
 
-    <!-- Asosiy Kontent -->
+
     <main>
-        <!-- ... -->
         {% block content %}
         {% endblock content %}
     </main>
 
     {% block javascript %}
     {% endblock javascript %}
+ <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            // Endi bu kod ishlaganda, document.body 100% mavjud bo'ladi
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        })
+    </script>
 
 </body>
 </html>

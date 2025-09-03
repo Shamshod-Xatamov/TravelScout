@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_tailwind',  # <-- ADD THIS
     'markdownify',
+    'django_summernote',
 
 
     #men ozim yaratgan applar
@@ -66,6 +67,7 @@ INSTALLED_APPS = [
     'trips',
     'flights',
     'support',
+    'stories',
 ]
 
 MIDDLEWARE = [
@@ -181,3 +183,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+X_FRAME_OPTIONS = 'SAMEORIGIN' #

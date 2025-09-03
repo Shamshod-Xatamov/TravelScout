@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if object %}Edit Your Story{% else %}Share Your Story{% endif %}
+{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto mt-8 px-4 mb-12">
+    <!-- Asosiy "kanvas"ni biroz toraytiramiz: max-w-6xl -->
+    <div class="max-w-6xl mx-auto bg-slate-900/80 backdrop-blur-lg rounded-xl p-8 md:p-12 border border-slate-700">
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Asosiy Grid (chap va o'ng ustunlar uchun) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-x-12">
+
+                <!-- CHAP USTUN (Asosiy kontent - 2 qism) -->
+                <div class="lg:col-span-2">
+                    <div class="space-y-6">
+                        <div class="mb-6">
+                            <h1 class="text-4xl font-extrabold text-white">
+                                {% if object %}Edit Your Masterpiece{% else %}What's Your Story?{% endif %}
+                            </h1>
+                            <p class="mt-2 text-slate-400">Let your journey inspire others. The best stories are born from adventure.</p>
+                        </div>
+
+                        <!-- Title maydoni -->
+                        <div>
+                            {{ form.title|as_crispy_field }}
+                        </div>
+
+                        <!-- Content (Summernote) maydoni -->
+                        <div>
+                            <label for="{{ form.content.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-300">Content*</label>
+                            {{ form.content }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- O'NG USTUN (Yordamchi ma'lumotlar - 1 qism) -->
+                <div class="lg:col-span-1">
+                    <div class="space-y-6 sticky top-24"> <!-- 'sticky' yordamida joyida qotiramiz -->
+                        <div class="bg-slate-800/50 p-5 rounded-lg border border-slate-700">
+                            {{ form.location|as_crispy_field }}
+                        </div>
+
+                        <div class="bg-slate-800/50 p-5 rounded-lg border border-slate-700">
+                            {% if object.cover_image %}
+                                <p class="text-sm text-slate-400 mb-2">Current Image:</p>
+                                <img src="{{ object.cover_image.url }}" class="rounded mb-2 max-h-40 w-full object-cover">
+                            {% endif %}
+                            {{ form.cover_image|as_crispy_field }}
+                        </div>
+
+                        <div class="bg-slate-800/50 p-5 rounded-lg border border-slate-700 text-slate-400 text-sm">
+                            <h4 class="font-bold text-white mb-2">Writing Tips</h4>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Use the toolbar for formatting.</li>
+                                <li>A great title grabs attention.</li>
+                                <li>Choose a captivating cover image.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- "Submit" tugmasi (Grid'dan tashqarida, chiroyli qilingan) -->
+            <div class="mt-10 pt-6 border-t border-slate-700 text-center">
+    <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold py-4 px-16 rounded-lg transition-all duration-300 text-xl transform hover:scale-105">
+        {% if object %}
+            <span>Save Changes</span>
+        {% else %}
+            <span>Publish Your Story</span>
+        {% endif %}
+    </button>
+</div>
+        </form>
+
+    </div>
+</div>
+{% endblock content %}

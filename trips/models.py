@@ -28,8 +28,7 @@ class TripPlan(models.Model):
     created_at=models.DateTimeField(auto_now_add=True)
     share_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
-    def __str__(self):
-        return f"Sayohat rejasi: {self.destination})"
+
     def get_absolute_url(self):
         return reverse('trip_detail',args=[str(self.id)])
 
