@@ -192,7 +192,7 @@ class TripPlanUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessage
                             "content": unified_prompt,
                         }
                     ],
-                    model="llama3-8b-8192",
+                    model="llama-3.3-70b-versatile",
                     temperature=0.7,
                 )
                 final_plan_text = chat_completion.choices[0].message.content

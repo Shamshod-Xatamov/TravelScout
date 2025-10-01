@@ -1,49 +1,43 @@
-# 1-qism: Quruvchi (Builder)
-FROM python:3.10 AS builder
+# 1-qadam: Bazaviy image tanlaymiz.
+FROM python:3.10-slim
+
+# Muhit o'zgaruvchilarini sozlash
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# WeasyPrint uchun kerakli tizim paketlari
+# 2-qadam: Tizim paketlarini o'rnatish. (Bu joyi to'g'ri ishlayapti)
 RUN apt-get update && apt-get install -y \
+    build-essential \
+    libffi-dev \
+    libcairo2 \
     libpango-1.0-0 \
-    libharfbuzz0b \
-    libgobject-2.0-0 \
-    fontconfig \
+    libpangocairo-1.0-0 \
+    libgdk-pixbuf-xlib-2.0-0 \
+    shared-mime-info \
     fonts-liberation \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
+# 3-qadam: Ishchi papkani yaratish
+WORKDIR /app
+
+# 4-qadam: Python bog'liqliklarini o'rnatish
 RUN pip install pipenv
 
-# --- BIZNING YECHIMIMIZ ---
-# "exceptiongroup" paketini qo'lda, majburan o'rnatamiz
+# --- MUAMMONING YECHIMI ---
+# "exceptiongroup" paketini to'g'ridan-to'g'ri, majburan o'rnatamiz
 RUN pip install exceptiongroup
 # -------------------------
 
-WORKDIR /app
-COPY Pipfile Pipfile.lock /app/
+COPY Pipfile Pipfile.lock ./
 RUN pipenv install --system --deploy --ignore-pipfile
 
+# 5-qadam: Loyiha kodini to'liq ko'chirish
+COPY . .
 
-# 2-qism: Yakuniy Image
-FROM python:3.10-slim
+# 6-qadam: Static fayllarni yig'ish (Production uchun muhim)
+RUN python manage.py collectstatic --no-input --clear
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Kerakli tizim paketlari va kutubxonalarni builder'dan ko'chiramiz
-COPY --from=builder /usr/lib/ /usr/lib/
-COPY --from=builder /lib/x86_64-linux-gnu /lib/x86_64-linux-gnu
-
-# O'rnatilgan Python paketlarini va komandalarni ko'chiramiz
-COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
-
-# Fontconfig xatoligini oldini olish uchun
-COPY --from=builder /etc/fonts /etc/fonts
-
-WORKDIR /app
-COPY . /app/
-
+# 7-qadam: Portni ochish va serverni ishga tushirish
 EXPOSE 8000
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application"]

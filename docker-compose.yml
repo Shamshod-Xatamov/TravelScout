@@ -13,7 +13,7 @@ services:
     environment:
       # Maxfiy bo'lmagan va baza bilan bog'liq sozlamalar shu yerda
       - DATABASE_URL=postgres://travelscout_user:travelscout_password@db:5432/travelscout_db
-      - DEBUG=1
+      - DEBUG=0
       - SECRET_KEY=django-insecure-qml!1-42m-3j_spp!el7%dr^dugtroise73&-4x#@eq&8*cwmf
     depends_on:
       - db
