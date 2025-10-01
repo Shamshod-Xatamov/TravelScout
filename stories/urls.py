@@ -7,6 +7,7 @@ from .views import (
     StoryDeleteView,
     PublicStoriesDetailView,
     story_like_view,
+    delete_comment,
 
 
 )
@@ -22,4 +23,6 @@ urlpatterns = [
     path('<int:pk>/', StoryDetailView.as_view(), name='story_detail'),
     path('share/<uuid:share_id>/', PublicStoriesDetailView.as_view(), name='story_share'),
     path('like/<int:pk>/', story_like_view, name='like_story'),
+    path('story/<int:pk>/', StoryDetailView.as_view(), name='story_detail'),
+    path('comment/<int:pk>/delete/', delete_comment, name='delete_comment')
 ]

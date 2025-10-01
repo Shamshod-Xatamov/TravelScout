@@ -1,6 +1,6 @@
 import os
 
-from groq import Groq
+
 from django.views.generic import CreateView,DetailView,ListView,UpdateView,DeleteView,TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin,UserPassesTestMixin
 from django.urls import reverse_lazy
@@ -13,19 +13,23 @@ from django.contrib.messages.views import SuccessMessageMixin
 from .forms import TripPlanForm,TripPlanUpdateForm
 import re
 import requests
+from groq import Groq
 from django.db.models import Q
 import json
-try:
-    groq_api_key = os.environ.get("GROQ_API_KEY")
-    if groq_api_key:
-        client = Groq(api_key=groq_api_key)
-    else:
-        client = None
-        print("WARNING: GROQ_API_KEY not found in .env file. AI features will be disabled.")
-except Exception as e:
-    print(f"Error initializing Groq client: {e}")
-    client = None
+import google.generativeai as genai
 
+# genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+#
+#
+# model = genai.GenerativeModel('gemini-1.0-pro')
+#
+# generation_config = genai.GenerationConfig(
+#                     temperature=0.7
+#                 )
+
+client = Groq(
+    api_key=os.environ.get("GROQ_API_KEY"),
+)
 class HomePageView(TemplateView):
     template_name = 'home.html'
 
@@ -48,57 +52,71 @@ class TripPlanCreateView(CreateView):
 
         final_plan_text = f"Error: Could not generate itinerary for {destination}."
 
-        if client:
-            try:
 
-                unified_prompt = f"""
-                Act as a world-class, expert travel consultant named 'Scout'. Your tone is enthusiastic, helpful, and highly detailed.
-                Your entire response MUST be in English and formatted in Markdown.
+        try:
 
-                **USER PREFERENCES:**
-                - Destination: {destination}
-                - Duration: {duration} days
-                - Interests: {interests}
-                - Budget: {budget} (Interpret this as: Economy = $, Standard = $$, Luxury = $$$)
+            unified_prompt = f"""
+            Act as a world-class, expert travel consultant named 'Scout'. Your tone is enthusiastic, helpful, and highly detailed.
+            Your entire response MUST be in English and formatted in Markdown.
+            
+             You have to generate how much the day is given , do not ignore it , generate separate plan for each day , do not combine 2-3 days in one
 
-                **--- ITINERARY STRUCTURE (MUST be followed exactly) ---**
-                # [A creative and exciting title for the trip]
-                [A short, 2-3 sentence welcoming paragraph.]
-                ---
-                ## Day 1: [A creative title for Day 1]
-                ### Morning
-                - **Activity:** [Description of an activity at a specific place]
-                - **Time:** [Estimated time]
-                - **Cost:** [Estimated cost]
-                - **Description:** [A short description]
-                - **Scout's Tip:** [A helpful tip]
-                (...repeat this structure for all {duration} days...)
-                ---
-                ## Overall Trip Summary
-                ### Budget Overview
-                - [A rough total estimated cost.]
-                ### General Tips
-                - [2-3 general tips.]
 
-                **--- CRITICAL FINAL REQUIREMENT ---**
-                At the VERY END of your entire response, after everything else, add a special section that starts with the exact marker `LOCATIONS_JSON:`.
-                This section must contain a valid, minified JSON array of objects. Each object represents a specific, plottable location mentioned in the itinerary and must have three keys: "name" (string), "lat" (number), and "lng" (number). Provide your best-effort, approximate coordinates.
+            **USER PREFERENCES:**
+            - Destination: {destination}
+            - Duration: {duration} days
+            - Interests: {interests}
+            - Budget: {budget} (Interpret this as: Economy = $, Standard = $$, Luxury = $$$)
 
-                Example:
-                LOCATIONS_JSON:[{{"name":"Eiffel Tower","lat":48.8584,"lng":2.2945}},{{"name":"Louvre Museum","lat":48.8606,"lng":2.3376}},{{"name":"Le Procope","lat":48.8530,"lng":2.3390}}]
-                """
+            **--- ITINERARY STRUCTURE (MUST be followed exactly) ---**
+            # [A creative and exciting title for the trip]
+            [A short, 2-3 sentence welcoming paragraph.]
+            ---
+            ## Day 1: [A creative title for Day 1]
+            ### Morning
+            - **Activity:** [Description of an activity at a specific place]
+            - **Time:** [Estimated time]
+            - **Cost:** [Estimated cost]
+            - **Description:** [A short description]
+            - **Scout's Tip:** [A helpful tip]
+            (...repeat this structure for all {duration} days...)
+            ---
+            ## Overall Trip Summary
+            ### Budget Overview
+            - [A rough total estimated cost.]
+            ### General Tips
+            - [2-3 general tips.]
 
-                completion = client.chat.completions.create(
-                    messages=[{"role": "user", "content": unified_prompt}],
-                    model="gemma-7b-it",
-                    temperature=0.7,
-                )
-                final_plan_text = completion.choices[0].message.content
-                print("INFO: Sayohat rejasi va geolokatsiyalar muvaffaqiyatli generatsiya qilindi.")
+            **--- CRITICAL FINAL REQUIREMENT ---**
+            At the VERY END of your entire response, after everything else, add a special section that starts with the exact marker `LOCATIONS_JSON:`.
+            This section must contain a valid, minified JSON array of objects. Each object represents a specific, plottable location mentioned in the itinerary and must have three keys: "name" (string), "lat" (number), and "lng" (number). Provide your best-effort, approximate coordinates.
 
-            except Exception as e:
-                print(f"ERROR: AI'ga so'rov yuborishda xatolik: {e}")
-                final_plan_text = f"An error occurred while generating the plan: {e}"
+            Example:
+            LOCATIONS_JSON:[{{"name":"Eiffel Tower","lat":48.8584,"lng":2.2945}},{{"name":"Louvre Museum","lat":48.8606,"lng":2.3376}},{{"name":"Le Procope","lat":48.8530,"lng":2.3390}}]
+            """
+
+
+
+            # response = model.generate_content(
+            #     unified_prompt,
+            #     generation_config=generation_config
+            # )
+            # final_plan_text = response.text
+            chat_completion = client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": unified_prompt,
+                    }
+                ],
+                model="llama-3.3-70b-versatile",
+                temperature=0.7,
+            )
+            final_plan_text = chat_completion.choices[0].message.content
+
+        except Exception as e:
+            print(f"ERROR: AI'ga so'rov yuborishda xatolik: {e}")
+            final_plan_text = f"An error occurred while generating the plan: {e}"
 
         form.instance.generated_plan = final_plan_text
         return super().form_valid(form)
@@ -112,7 +130,7 @@ class TripPlanUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessage
     success_message = "Your travel plan was updated successfully!"
 
     def form_valid(self, form):
-        # Yaratishdagi logikani deyarli to'liq takrorlaymiz
+
         destination = form.cleaned_data.get('destination')
         duration = form.cleaned_data.get('duration_days')
         interests = form.cleaned_data.get('interests')
@@ -120,12 +138,14 @@ class TripPlanUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessage
 
         final_plan_text = f"Error: Could not regenerate itinerary for {destination}."
 
-        if client:
+        if model:
             try:
                 # --- Xuddi o'sha yagona, KUCHAYTIRILGAN PROMPT ---
                 unified_prompt = f"""
                 Act as a world-class, expert travel consultant named 'Scout'. Your tone is enthusiastic, helpful, and highly detailed.
                 Your entire response MUST be in English and formatted in Markdown.
+                
+                You have to generate how much the day is given , do not ignore it , generate separate plan for each day , do not combine 2-3 days in one
 
                 **USER PREFERENCES:**
                 - Destination: {destination}
@@ -160,14 +180,22 @@ class TripPlanUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessage
                 LOCATIONS_JSON:[{{"name":"Eiffel Tower","lat":48.8584,"lng":2.2945}},{{"name":"Louvre Museum","lat":48.8606,"lng":2.3376}},{{"name":"Le Procope","lat":48.8530,"lng":2.3390}}]
                 """
 
-                completion = client.chat.completions.create(
-                    messages=[{"role": "user", "content": unified_prompt}],
-                    model="llama3-70b-8192",
+                # response = model.generate_content(
+                #     unified_prompt,
+                #     generation_config=generation_config
+                # )
+                # final_plan_text = response.text
+                chat_completion = client.chat.completions.create(
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": unified_prompt,
+                        }
+                    ],
+                    model="llama3-8b-8192",
                     temperature=0.7,
                 )
-                final_plan_text = completion.choices[0].message.content
-                print("INFO: Sayohat rejasi va geolokatsiyalar muvaffaqiyatli yangilandi.")
-
+                final_plan_text = chat_completion.choices[0].message.content
             except Exception as e:
                 print(f"ERROR: AI'ga so'rov yuborishda xatolik: {e}")
                 final_plan_text = f"An error occurred while generating the plan: {e}"

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Story
+from .models import Story,StoryComment
 from django_summernote.widgets import SummernoteWidget
 class StoryForm(forms.ModelForm):
     content = forms.CharField(widget=SummernoteWidget())
@@ -16,4 +16,14 @@ class StoryForm(forms.ModelForm):
             'location': 'Location of Your Story',
             'cover_image': 'Upload a beautiful cover image',
             'content': 'Your Story',
+        }
+
+
+class StoryCommentForm(forms.ModelForm):
+    class Meta:
+        model = StoryComment
+
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Leave a comment...'}),
         }

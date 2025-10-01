@@ -34,3 +34,4 @@ class TripPlan(models.Model):
 
     def get_share_url(self):
         return reverse("public_plan_detail", kwargs={"share_id": self.share_id})
+

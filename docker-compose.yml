@@ -1,0 +1,32 @@
+# docker-compose.yml (YAKUNIY, GIBRID VERSIYA)
+
+services:
+  web:
+    build: .
+    env_file:
+      - .env  # FAQAT maxfiy kalitlar shu yerdan olinadi
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --timeout 300"
+    ports:
+      - "8000:8000"
+    environment:
+      # Maxfiy bo'lmagan va baza bilan bog'liq sozlamalar shu yerda
+      - DATABASE_URL=postgres://travelscout_user:travelscout_password@db:5432/travelscout_db
+      - DEBUG=1
+      - SECRET_KEY=django-insecure-qml!1-42m-3j_spp!el7%dr^dugtroise73&-4x#@eq&8*cwmf
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      # Baza uchun sozlamalar shu yerda, chunki ular maxfiy emas
+      - POSTGRES_DB=travelscout_db
+      - POSTGRES_USER=travelscout_user
+      - POSTGRES_PASSWORD=travelscout_password
+
+volumes:
+  postgres_data:

@@ -14,6 +14,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+
+import dj_database_url
 import os
 load_dotenv()
 
@@ -105,10 +107,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
+    )
 }
 
 
@@ -184,3 +185,15 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 X_FRAME_OPTIONS = 'SAMEORIGIN' #
+
+SECRET_KEY = os.environ.get('SECRET_KEY')
+DEBUG = int(os.environ.get('DEBUG', 1)) # DEBUG ni 1 yoki 0 (son) qilib olamiz
+
+
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
+POSITIONSTACK_API_KEY = os.environ.get('POSITIONSTACK_API_KEY')
+AMADEUS_API_KEY = os.environ.get('AMADEUS_API_KEY')
+AMADEUS_API_SECRET = os.environ.get('AMADEUS_API_SECRET')
+RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY')

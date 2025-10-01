@@ -111,5 +111,95 @@
         </a>
     </div>
 
+    <div class="max-w-4xl mx-auto mt-12">
+    <div x-data="{ open: true }" class="bg-slate-900/80 backdrop-blur-lg rounded-xl border border-slate-700 transition-all duration-300">
+        <!-- Accordion Header -->
+        <div @click="open = !open" class="cursor-pointer p-6 flex justify-between items-center border-b border-slate-800">
+            <h2 class="text-2xl font-bold text-white">
+                Comments
+                <span class="text-base font-normal text-cyan-400 ml-2">({{ comments.count }})</span>
+            </h2>
+            <svg :class="{'rotate-180': open}" class="w-6 h-6 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+
+
+        <div x-show="open" x-transition class="p-6">
+
+            {% if user.is_authenticated %}
+                <form method="post" class="mb-8">
+                    {% csrf_token %}
+                    <div class="flex items-start gap-4">
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="h-10 w-10 rounded-full object-cover">
+                        <div class="flex-1">
+                            <!-- Display form errors here -->
+                            {% if comment_form.text.errors %}
+                                <div class="p-2 mb-2 text-sm text-red-700 bg-red-100 rounded-lg">
+                                    {{ comment_form.text.errors }}
+                                </div>
+                            {% endif %}
+                            <textarea
+                                name="{{ comment_form.text.name }}"
+                                id="{{ comment_form.text.id_for_label }}"
+                                rows="3"
+                                placeholder="Add a public comment..."
+                                class="w-full bg-slate-800 border border-slate-600 rounded-md p-3 text-slate-200 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
+                            ></textarea>
+                            <div class="text-right mt-2">
+                                <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-md transition-colors">
+                                    Post Comment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            {% else %}
+                <p class="mb-8 text-slate-300"><a href="{% url 'login' %}?next={{ request.path }}" class="text-cyan-400 font-bold hover:underline">Log in</a> to join the conversation.</p>
+            {% endif %}
+
+
+            <div class="space-y-4">
+    {% for comment in comments %}
+        <!-- Bitta komment uchun "Kartochka" -->
+        <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+            <div class="flex items-start gap-4">
+                <!-- User Profile Picture -->
+                <img src="{{ comment.user.profile_picture.url }}" alt="{{ comment.user.username }}" class="h-10 w-10 rounded-full object-cover flex-shrink-0">
+
+                <div class="flex-1">
+
+                    <div class="flex items-baseline gap-2">
+                        <p class="font-semibold text-white">{{ comment.user.username }}</p>
+                        <p class="text-xs text-slate-400 hover:text-slate-300 transition">{{ comment.created_at|timesince }} ago</p>
+
+                        {% if comment.user == user %}
+                        <form action="{% url 'stories:delete_comment' pk=comment.pk %}" method="post">
+                            {% csrf_token %}
+                            <button
+                                type="submit"
+                                class="bg-red-600/20 hover:bg-red-600/40 text-red-400 hover:text-red-300
+                                       font-semibold text-xs py-1 px-3 rounded-full transition-colors"
+                                aria-label="Delete comment"
+                            >
+                                Delete
+                            </button>
+                        </form>
+                    {% endif %}
+                    </div>
+                    <div class="prose prose-invert prose-sm max-w-none text-slate-300 leading-relaxed mt-1">
+                        {{ comment.text|markdownify|linebreaks }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    {% empty %}
+        <p class="text-slate-400 text-center py-4">No comments yet. Be the first!</p>
+    {% endfor %}
+</div>
+        </div>
+    </div>
+</div>
+
 </div>
 {% endblock content %}
