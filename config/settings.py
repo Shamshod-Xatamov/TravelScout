@@ -34,12 +34,8 @@ SECRET_KEY = 'django-insecure-qml!1-42m-3j_spp!el7%dr^dugtroise73&-4x#@eq&8*cwmf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    '172.20.10.2',
-
-]
+ALLOWED_HOSTS_str = os.environ.get('ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_str.split(',') if host.strip()]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
